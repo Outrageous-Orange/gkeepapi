@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-import unittest
 import logging
+import unittest
 
 from gkeepapi import node
 
 logging.getLogger(node.__name__).addHandler(logging.NullHandler())
+
 
 def generate_save_load(cls):
     """Constructs an empty object and clones it from the serialized representation."""
@@ -13,13 +14,15 @@ def generate_save_load(cls):
     b.load(a.save())
     return a.save(), b.save()
 
+
 def clean_node(n):
     n.save()
     if isinstance(n, node.Node):
         for c in n.children:
             c.save()
-    assert(not n.dirty)
+    assert (not n.dirty)
     return n
+
 
 class AnnotationTests(unittest.TestCase):
     def test_save_load(self):
@@ -35,6 +38,7 @@ class AnnotationTests(unittest.TestCase):
             c = node.Category()
             c.category = node.CategoryValue.Books
             return c
+
         a, b = generate_save_load(Category)
         self.assertEqual(a, b)
 
@@ -93,6 +97,7 @@ class AnnotationTests(unittest.TestCase):
         self.assertTrue(n.dirty)
         self.assertEqual(SUGGEST, n.suggest)
 
+
 class ContextTests(unittest.TestCase):
     def test_save_load(self):
         a, b = generate_save_load(node.Context)
@@ -109,6 +114,7 @@ class ContextTests(unittest.TestCase):
 
         n.load(data)
         self.assertEqual(1, len(n._entries))
+
 
 class NodeAnnotationsTests(unittest.TestCase):
     def test_save_load(self):
@@ -154,6 +160,7 @@ class NodeAnnotationsTests(unittest.TestCase):
         self.assertTrue(n.dirty)
         self.assertEqual([sub], n.links)
 
+
 class NodeTimestampsTests(unittest.TestCase):
     def test_save_load(self):
         a, b = generate_save_load(node.NodeTimestamps)
@@ -189,6 +196,7 @@ class NodeTimestampsTests(unittest.TestCase):
         self.assertTrue(n.dirty)
         self.assertEqual(TZ, n.edited)
 
+
 class NodeSettingsTests(unittest.TestCase):
     def test_save_load(self):
         a, b = generate_save_load(node.NodeSettings)
@@ -216,6 +224,7 @@ class NodeSettingsTests(unittest.TestCase):
         self.assertTrue(n.dirty)
         self.assertEqual(ITEMPOLICY, n.checked_listitems_policy)
 
+
 class NodeLabelsTests(unittest.TestCase):
     def test_save_load(self):
         a, b = generate_save_load(node.NodeLabels)
@@ -240,6 +249,7 @@ class NodeLabelsTests(unittest.TestCase):
         n.remove(sub)
         self.assertTrue(n.dirty)
         self.assertEqual([], n.all())
+
 
 class NodeTests(unittest.TestCase):
     def test_save_load(self):
@@ -318,10 +328,12 @@ class NodeTests(unittest.TestCase):
         self.assertTrue(n.dirty)
         # FIXME: Node is not done
 
+
 class TestElement(node.Element, node.TimestampsMixin):
     def __init__(self):
         super(TestElement, self).__init__()
         self.timestamps = node.NodeTimestamps(0)
+
 
 class TimestampsMixinTests(unittest.TestCase):
     def test_touch(self):
@@ -368,6 +380,7 @@ class TimestampsMixinTests(unittest.TestCase):
         self.assertTrue(n.timestamps.dirty)
         self.assertTrue(n.timestamps.deleted > node.NodeTimestamps.int_to_dt(0))
 
+
 class TopLevelNodeTests(unittest.TestCase):
     def test_fields(self):
         n = node.TopLevelNode(type_=node.NodeType.Note)
@@ -410,6 +423,7 @@ class TopLevelNodeTests(unittest.TestCase):
         n.labels.remove(l)
         self.assertTrue(n.dirty)
 
+
 class NoteTests(unittest.TestCase):
     def test_fields(self):
         n = node.Note(id_='3')
@@ -423,6 +437,7 @@ class NoteTests(unittest.TestCase):
 
         self.assertEqual('https://keep.google.com/u/0/#NOTE/3', n.url)
 
+
 class ListTests(unittest.TestCase):
     def test_fields(self):
         n = node.List()
@@ -433,6 +448,7 @@ class ListTests(unittest.TestCase):
         n.add('Text')
         self.assertTrue(n.dirty)
         self.assertEqual(u'☐ %s' % TEXT, n.text)
+
 
 class ListItemTests(unittest.TestCase):
     def test_fields(self):
@@ -450,6 +466,7 @@ class ListItemTests(unittest.TestCase):
         n.checked = CHECKED
         self.assertTrue(n.dirty)
         self.assertEqual(CHECKED, n.checked)
+
 
 class CollaboratorTests(unittest.TestCase):
     def test_save_load(self):
@@ -471,6 +488,7 @@ class CollaboratorTests(unittest.TestCase):
         n.collaborators.remove(collab)
         self.assertTrue(n.dirty)
 
+
 class BlobTests(unittest.TestCase):
     def test_save_load(self):
         a, b = generate_save_load(node.NodeImage)
@@ -486,6 +504,7 @@ class BlobTests(unittest.TestCase):
         # FIXME: Not implemented
         pass
 
+
 class LabelTests(unittest.TestCase):
     def test_save_load(self):
         a, b = generate_save_load(node.Label)
@@ -494,6 +513,7 @@ class LabelTests(unittest.TestCase):
     def test_fields(self):
         # FIXME: Not implemented
         pass
+
 
 if __name__ == '__main__':
     unittest.main()
